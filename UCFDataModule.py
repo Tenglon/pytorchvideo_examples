@@ -24,9 +24,6 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
         self._NUM_WORKERS = num_workers  
         self._CLIP_FRAMES = clip_frames
 
-        import pdb
-        pdb.set_trace()
-
         if transform is not None:
             self._TRANSFORM = transform
         else:
