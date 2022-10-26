@@ -60,7 +60,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
             drop_last=True
         )
 
-    def valid_dataloader(self):
+    def val_dataloader(self):
         """
         Create the Kinetics validation partition from the list of video labels
         in {self._DATA_PATH}/val
