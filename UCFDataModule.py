@@ -8,7 +8,7 @@ import torch.utils.data
 class UCFDataModule(pytorch_lightning.LightningDataModule):
 
     def __init__(self,
-                    data_path = '/home/longteng/ssd/ucf_anno/', # Dataset configuration
+                    data_path = '/local/tlong/data/ucf_anno/', # Dataset configuration
                     clip_duration = 16/30, # Duration of sampled clip for each video
                     batch_size = 8,
                     num_workers = 0, # Number of parallel processes fetching data
@@ -56,6 +56,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
             train_dataset,
             batch_size=self._BATCH_SIZE,
             num_workers=self._NUM_WORKERS,
+            persistent_workers=True,
             drop_last=True
         )
 
@@ -75,6 +76,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
             val_dataset,
             batch_size=self._BATCH_SIZE,
             num_workers=self._NUM_WORKERS,
+            persistent_workers=True,
             # shuffle=True,
             drop_last=True
         )
