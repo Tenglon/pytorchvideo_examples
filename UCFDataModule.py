@@ -46,7 +46,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
         in {self._DATA_PATH}/train
         """
         train_dataset = pytorchvideo.data.Ucf101(
-            data_path=self._DATA_PATH + 'trainlist01.csv',
+            data_path=self._DATA_PATH + 'trainlist04.csv',
             clip_sampler=pytorchvideo.data.make_clip_sampler(
                 "random", self._CLIP_DURATION),
             decode_audio=False,
@@ -56,7 +56,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
             train_dataset,
             batch_size=self._BATCH_SIZE,
             num_workers=self._NUM_WORKERS,
-            persistent_workers=True,
+            # persistent_workers=True,
             drop_last=True
         )
 
@@ -66,7 +66,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
         in {self._DATA_PATH}/val
         """
         val_dataset = pytorchvideo.data.Ucf101(
-            data_path=self._DATA_PATH + 'test01.csv',
+            data_path=self._DATA_PATH + 'test04.csv',
             clip_sampler=pytorchvideo.data.make_clip_sampler(
                 "uniform", self._CLIP_DURATION),
             decode_audio=False,
@@ -76,7 +76,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
             val_dataset,
             batch_size=self._BATCH_SIZE,
             num_workers=self._NUM_WORKERS,
-            persistent_workers=True,
+            # persistent_workers=True,
             # shuffle=True,
             drop_last=True
         )
@@ -85,7 +85,7 @@ class UCFDataModule(pytorch_lightning.LightningDataModule):
 if __name__ == '__main__':
     data_module = UCFDataModule()
     train_loader = data_module.train_dataloader()
-    valid_loader = data_module.valid_dataloader()
+    valid_loader = data_module.val_dataloader()
 
     for batch in train_loader:
         break
