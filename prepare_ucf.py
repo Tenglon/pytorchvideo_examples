@@ -1,4 +1,3 @@
-
 import os
 import re
 from glob import glob
@@ -49,6 +48,11 @@ for train_file in [train1_file, train2_file, train3_file]:
         new_lines = []
         for line in lines:
             new_line = re.sub('[a-zA-Z0-9]*/', video_base, line)
+
+            path, label = new_line.split(' ')
+            label_minums_one = str(int(label) - 1)
+            new_line = ' '.join([path, label_minums_one])
+
             new_lines.append(new_line + '\n')
             
         fp.writelines(new_lines)
@@ -74,7 +78,9 @@ for i,test_file in enumerate([test1_file, test2_file, test3_file]):
         label = path2clsind_df.loc[row_pos,'label']
         label = label.values[0]
 
-        test_dict[v_path] = label
+        label_minums_one = str(int(label) - 1) o
+
+        test_dict[v_path] = label_minums_one
 
     test_path2clsind_df = pd.DataFrame.from_dict(test_dict, orient='index')
 
