@@ -129,24 +129,10 @@ if __name__ == '__main__':
 
     for batch in tqdm(feat_train_loader):
         frames, audio_raw, label = batch['video'], batch['audio'], batch['label']
-        video_name, video_index, aug_index = batch['video_name'], batch['video_index'], batch['aug_index']
-
-        # audio = torch.vstack([get_spec(wav, sample_rate = 44100) for wav in audio_raw])
-        # import pdb
-        # pdb.set_trace()
-        # audio_raw2 = F.interpolate(audio_raw[None, None, :, :], size = (audio_raw.shape[0], 24000)).squeeze()
-        # audio2 = torch.vstack([get_spec(wav[None,None,:], sample_rate = 24000) for wav in audio_raw2])
-
-        # from scipy.io.wavfile import write
+        video_name, video_index, clip_index = batch['video_name'], batch['video_index'], batch['clip_index']
 
         import pdb  
         pdb.set_trace()
-        # audio_raw_cpu = audio_raw.cpu().numpy()
-        # audio_raw2_cpu = audio_raw2.cpu().numpy()
-        # scaled = np.int16(audio_raw_cpu / np.max(np.abs(audio_raw_cpu)) * 32767)
-        # write('test.wav', 44100, scaled)
-        # scaled2 = np.int16(audio_raw2_cpu / np.max(np.abs(audio_raw2_cpu)) * 32767)
-        # write('test2.wav', 24000, scaled)
 
         break
         pass
