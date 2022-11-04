@@ -3,13 +3,9 @@ import pytorchvideo.data
 import pytorchvideo.transforms
 import torchvision
 import torch.utils.data
-import torch.nn.functional as F
 import os
 
 from tqdm import tqdm
-import numpy as np
-import ffmpeg
-from python_speech_features import logfbank
 
 
 class K400DataModule(pytorch_lightning.LightningDataModule):
@@ -128,7 +124,7 @@ if __name__ == '__main__':
     feat_train_loader = data_module.feat_train_dataloader()
 
     for batch in tqdm(feat_train_loader):
-        frames, audio_raw, label = batch['video'], batch['audio'], batch['label']
+        frames, audio, label = batch['video'], batch['audio'], batch['label']
         video_name, video_index, clip_index = batch['video_name'], batch['video_index'], batch['clip_index']
 
         import pdb  
