@@ -6,22 +6,24 @@ from tqdm import tqdm
 from model import load_model
 from pathlib import Path
 
+# CUDA_VISIBLE_DEVICES=0 && python yk400_feat.py
+
 class ARGS():
     def __init__(self):
         # data parameters
-        self.dataset                    = 'kinetics'
-        self.data_dir                   = '/home/longteng/ssd/Kinetics400split'
-        self.mode                       = 'train'
+        # self.dataset                    = 'kinetics'
+        self.data_dir                   = '/local/tlong/yk400'
+        self.mode                       = 'train' # mode here means train/val/test split
 
         self.num_sec_aud                = 1 # default
         self.aud_sample_rate            = 24000 # default
-        self.aud_spec_type              = 2 
+        self.aud_spec_type              = 2
         self.use_volume_jittering       = False # default
-        self.use_audio_temp_jittering   = False #default
+        self.use_audio_temp_jittering   = False # default
         self.z_normalize                = True  # default for audio
 
-        self.batch_size                 = 4
-        self.workers                    = 0
+        self.batch_size                 = 10
+        self.workers                    = 30
 
         # model parameters
         self.vid_base_arch = 'r2plus1d_18'
@@ -32,10 +34,10 @@ class ARGS():
         self.num_clusters  = 400
 
         # feature parameters
-        self.weights_path  = Path('/home/longteng/ssd/selavi/weights/selavi_kinetics.pth') # should be str type
+        self.weights_path  = Path('/local/tlong/code/selavi/weights/selavi_kinetics.pth') # should be str type
         self.a_layer_names = ['base.layer1', 'base.layer2', 'base.layer3', 'base.layer4', 'base.flatten']
         self.v_layer_names = ['base.layer4', 'base.flatten']
-        self.feat_base     = Path('./feature/kinetics/train')
+        self.feat_base     = Path('./k400_feat/train')
 
 def load_model_parameters(model, model_weights):
     loaded_state = model_weights
@@ -47,8 +49,6 @@ def load_model_parameters(model, model_weights):
         if name in self_state.keys():
             self_state[name].copy_(param)
         else:
-            import pdb
-            pdb.set_trace()
             print("didnt load ", name)
 
 
@@ -137,6 +137,9 @@ if __name__ == '__main__':
                 new_clip_index = clip_index[i].unsqueeze(dim = 0)
                 est_clip_index = est_feat_dict['clip_index']
                 out_feat_dict['clip_index'] = torch.hstack([est_clip_index, new_clip_index])
+
+                if new_clip_index in est_clip_index:
+                    continue
 
                 # process features
                 for layer_name in args.a_layer_names:
