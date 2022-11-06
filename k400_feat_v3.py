@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from K400DataModule import K400DataModule
 from torchvision.models.feature_extraction import create_feature_extractor
 
@@ -23,7 +24,7 @@ class ARGS():
         self.z_normalize                = True  # default for audio
 
         self.batch_size                 = 10
-        self.workers                    = 20
+        self.workers                    = 0
 
         # model parameters
         self.vid_base_arch = 'r2plus1d_18'
@@ -90,11 +91,11 @@ def get_clip_feat(args, i, v_feats, a_feats):
     out_feat_dict = dict()
     for layer_name in args.a_layer_names:
         a_key = 'audio.' + layer_name
-        out_feat_dict[a_key] = a_feats[layer_name][i].unsqueeze(dim = 0)
+        out_feat_dict[a_key] = a_feats[layer_name][i].unsqueeze(dim = 0).numpy()
 
     for layer_name in args.v_layer_names:
         v_key = 'video.' + layer_name
-        out_feat_dict[v_key] = v_feats[layer_name][i].unsqueeze(dim = 0)
+        out_feat_dict[v_key] = v_feats[layer_name][i].unsqueeze(dim = 0).numpy()
 
     return out_feat_dict
 
@@ -132,6 +133,9 @@ if __name__ == '__main__':
     ################################################################################################
     for batch in tqdm(feat_train_loader):
 
+        if 'audio' not in batch.keys():
+            continue
+
         frames, audio, label = batch['video'], batch['audio'], batch['label']
         video_name, video_index, clip_index = batch['video_name'], batch['video_index'], batch['clip_index']
 
@@ -143,11 +147,12 @@ if __name__ == '__main__':
             clip_feat_path = get_clip_feat_path(feat_base, video_name, clip_index, i)
 
             if clip_feat_path.exists():
-                print(f'video {video_name[i]}, clip {clip_index[i]} feature exists')
+                # print(f'video {video_name[i]}, clip {clip_index[i]} feature exists')
                 exist_samples_in_batch.add(i)
                 continue
 
         if len(exist_samples_in_batch) == args.batch_size:
+            # print(f'skip batch for video {video_name[i]} as feature exists')
             continue
         ################################################################################################
 
@@ -176,8 +181,8 @@ if __name__ == '__main__':
             if clip_feat_path.exists():
                 continue
 
-            # feature not exist, store it
+            # feature not exist, store itb
             out_feat_dict = get_clip_feat(args, i, v_feats, a_feats)
-            
-            torch.save(out_feat_dict, clip_feat_path)
+            np.savez_compressed(clip_feat_path, out_feat_dict)   # type: ignore
         ################################################################################################
+
