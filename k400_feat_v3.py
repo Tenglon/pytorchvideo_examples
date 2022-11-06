@@ -137,16 +137,17 @@ if __name__ == '__main__':
 
         # Step3.1: check if entire batch are already extracted, to avoid forward() 
         ################################################################################################
-        exist_count = 0     
+        exist_samples_in_batch = set()
         for i in range(args.batch_size):
             
             clip_feat_path = get_clip_feat_path(feat_base, video_name, clip_index, i)
+
             if clip_feat_path.exists():
                 print(f'video {video_name[i]}, clip {clip_index[i]} feature exists')
-                exist_count += 1
+                exist_samples_in_batch.add(i)
                 continue
 
-        if exist_count == args.batch_size:
+        if len(exist_samples_in_batch) == args.batch_size:
             continue
         ################################################################################################
 
@@ -164,7 +165,8 @@ if __name__ == '__main__':
 
         # Step3.3 Loop over each sample in batch to store the features
         ################################################################################################
-        for i in range(args.batch_size):
+        no_exist_samples_in_batch = set(range(args.batch_size)) - exist_samples_in_batch
+        for i in no_exist_samples_in_batch:
 
             print(f'processing video {video_name[i]}, clip {clip_index[i]}')
 
@@ -179,4 +181,3 @@ if __name__ == '__main__':
             
             torch.save(out_feat_dict, clip_feat_path)
         ################################################################################################
-
