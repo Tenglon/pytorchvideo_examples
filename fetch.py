@@ -45,9 +45,10 @@ class _IterableDatasetFetcher(_BaseDatasetFetcher):
             for i, inx in enumerate(audio_not_exist_inx):
                 if inx == True:
                     video_path = data[i]['video_name']
-                    print(f'soundless video {video_path}')
-            import pdb
-            pdb.set_trace()
+                    import logging
+                    logging.basicConfig(level=logging.INFO)
+                    logger = logging.getLogger(__name__)
+                    logger.error(f'soundless video {video_path}')
         #############################################################################
         return self.collate_fn(data)
 
