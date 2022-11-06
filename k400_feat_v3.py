@@ -12,7 +12,7 @@ from pathlib import Path
 class ARGS():
     def __init__(self):
         # data parameters
-        # self.dataset                    = 'kinetics'
+        self.dataset                    = 'kinetics'
         self.data_dir                   = '/local/tlong/yk400'
         self.mode                       = 'train' # mode here means train/val/test split
 
@@ -75,20 +75,23 @@ def define_and_load_model(args):
     return model
 
 def get_clip_feat_path(feat_base, video_name, clip_index, i):
+
     path_parts = Path(video_name[i]).parts
     class_name, video_fn = path_parts[-2], path_parts[-1], 
     video_base = feat_base / class_name / video_fn
 
     video_base.mkdir(parents=True, exist_ok=True)
 
-    # output file name is defined as {video_name}/{clip_index}.pth
+    # output file name is defined as {video_name}/{clip_index}.npz
     clip_feat_fn_wo_ext = video_base / str(clip_index[i].item())
-    clip_feat_fn_wi_ext = clip_feat_fn_wo_ext.with_suffix('.pth')
+    clip_feat_fn_wi_ext = clip_feat_fn_wo_ext.with_suffix('.npz')
     return clip_feat_fn_wi_ext
 
-def get_clip_feat(args, i, v_feats, a_feats):
+def get_clip_feat(args, i, v_feats, a_feats, batch_label):
 
     out_feat_dict = dict()
+    out_feat_dict['label'] = batch_label
+
     for layer_name in args.a_layer_names:
         a_key = 'audio.' + layer_name
         out_feat_dict[a_key] = a_feats[layer_name][i].unsqueeze(dim = 0).numpy()
@@ -136,13 +139,13 @@ if __name__ == '__main__':
         if 'audio' not in batch.keys():
             continue
 
-        frames, audio, label = batch['video'], batch['audio'], batch['label']
+        frames, audio, batch_label = batch['video'], batch['audio'], batch['label']
         video_name, video_index, clip_index = batch['video_name'], batch['video_index'], batch['clip_index']
 
         # Step3.1: check if entire batch are already extracted, to avoid forward() 
         ################################################################################################
         exist_samples_in_batch = set()
-        for i in range(args.batch_size):
+        for i in range(len(batch_label)):
             
             clip_feat_path = get_clip_feat_path(feat_base, video_name, clip_index, i)
 
@@ -151,7 +154,7 @@ if __name__ == '__main__':
                 exist_samples_in_batch.add(i)
                 continue
 
-        if len(exist_samples_in_batch) == args.batch_size:
+        if len(exist_samples_in_batch) == range(len(batch_label)):
             # print(f'skip batch for video {video_name[i]} as feature exists')
             continue
         ################################################################################################
@@ -170,7 +173,8 @@ if __name__ == '__main__':
 
         # Step3.3 Loop over each sample in batch to store the features
         ################################################################################################
-        no_exist_samples_in_batch = set(range(args.batch_size)) - exist_samples_in_batch
+        no_exist_samples_in_batch = set(range(len(batch_label))) - exist_samples_in_batch
+        save_processes = []
         for i in no_exist_samples_in_batch:
 
             print(f'processing video {video_name[i]}, clip {clip_index[i]}')
@@ -182,7 +186,9 @@ if __name__ == '__main__':
                 continue
 
             # feature not exist, store itb
-            out_feat_dict = get_clip_feat(args, i, v_feats, a_feats)
-            np.savez_compressed(clip_feat_path, out_feat_dict)   # type: ignore
+            out_feat_dict = get_clip_feat(args, i, v_feats, a_feats, batch_label)
+            # torch.save(out_feat_dict, clip_feat_path)   # type: ignore
+            np.savez(clip_feat_path, out_feat_dict)   # type: ignore
+            # np.savez_compressed(clip_feat_path, out_feat_dict)   # type: ignore
         ################################################################################################
 
