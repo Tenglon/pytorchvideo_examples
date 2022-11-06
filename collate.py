@@ -164,13 +164,19 @@ def default_collate(batch):
                 for i, inx in enumerate(video_bad_size_inx):
                     if inx == True:
                         video_path = batch[i]['video_name']
-                        print(f'wrong shaped video {video_path}')
+                        import logging
+                        logging.basicConfig(level=logging.INFO)
+                        logger = logging.getLogger(__name__)
+                        logger.error(f'wrong shaped video {video_path}')
             audio_bad_size_inx = [item['audio'].size() != torch.Size([1, 257, 99]) for item in batch]
             if sum(audio_bad_size_inx) > 0:
                 for i, inx in enumerate(audio_bad_size_inx):
                     if inx == True:
                         video_path = batch[i]['video_name']
-                        print(f'wrong shaped audio {video_path}')
+                        import logging
+                        logging.basicConfig(level=logging.INFO)
+                        logger = logging.getLogger(__name__)
+                        logger.error(f'wrong shaped audio {video_path}')
             #############################################################################
             return elem_type({key: default_collate([d[key] for d in batch]) for key in elem})
         except TypeError:
