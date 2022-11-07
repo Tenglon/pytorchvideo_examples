@@ -1,6 +1,5 @@
 from pathlib import Path
 import numpy as np
-from tqdm import tqdm
 from multiprocessing import Pool
 
 def f(video_feat_path):
@@ -25,7 +24,7 @@ def f(video_feat_path):
     out_path = small_base / class_name / video_fn
 
     if out_path.exists():
-        continue
+        return
     out_path.mkdir(parents=True, exist_ok=True)
 
 
@@ -39,7 +38,7 @@ feat_base = Path('./k400_feat/train/')
 small_base = Path('./small_feat/train/')
 small_base.mkdir(parents = True, exist_ok=True)
 
-video_feat_paths = feat_base.glob('z*/*.mp4')
+video_feat_paths = feat_base.glob('y*/*.mp4')
 
 with Pool(20) as p:
     print(p.map(f, video_feat_paths))
