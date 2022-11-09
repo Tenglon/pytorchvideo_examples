@@ -53,11 +53,14 @@ class SmallFeatDataset(Dataset):
 
         return a_feat[rand_inx, :, :], v_feat[rand_inx, :, :], label
 
-feat_base = '/home/longteng/ssd/k400_small_feat/train'
-training_data = SmallFeatDataset(feat_base, a_feat_name = 'audio.base.layer1', v_feat_name = 'video.base.layer4')
 
-train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True, num_workers=20)
+if __name__ == '__main__':
+    
+    feat_base = '/home/longteng/ssd/k400_small_feat/train'
+    training_data = SmallFeatDataset(feat_base, a_feat_name = 'audio.base.layer1', v_feat_name = 'video.base.layer4')
 
-for a_feat, v_feat, label in tqdm(train_dataloader):
+    train_dataloader = DataLoader(training_data, batch_size=16, shuffle=True, num_workers=20)
 
-    pass
+    for a_feat, v_feat, label in tqdm(train_dataloader):
+
+        pass
