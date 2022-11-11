@@ -3,14 +3,16 @@ from pathlib import Path
 import os
 from tqdm import tqdm
 
-base = Path('/local/tlong/ucf101')
+
+src_base = Path('/local/tlong/ucf101')
+
 def link_video(dest, file_path:Path):
     video_fn = file_path.parts[-1]
     cls_name = video_fn.split('_')[1]
     out_base = dest / cls_name
     out_base.mkdir(parents=True, exist_ok=True)
 
-    cmd = f'ln -s {video_fn} {out_base / video_fn}'
+    cmd = f'ln -s {src_base / video_fn} {out_base / video_fn}'
     os.system(cmd)
 
 # for i in range(1,4):
